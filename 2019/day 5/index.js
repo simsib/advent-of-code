@@ -14,7 +14,7 @@ function getParameterMode(mode) {
     };
 }
 
-function program(data) {
+function program(data, INPUT) {
     const outputs = [];
     let index = 0;
 
@@ -24,41 +24,96 @@ function program(data) {
 
         const op1Pos = parseInt( modes.param1mode === '0' ? parseInt(data[index + 1]) : index + 1);
         const op2Pos = parseInt( modes.param2mode === '0' ? parseInt(data[index + 2]) : index + 2);
-        const resPosition = parseInt(modes.param3mode === '0' ? parseInt(data[index + 3]): index + 3);
+        const op3Pos = parseInt(modes.param3mode === '0' ? parseInt(data[index + 3]): index + 3);
 
         const op1 = parseInt(data[op1Pos]);
         const op2 = parseInt(data[op2Pos]);
 
         switch (command) {
-            case '01': {
-                data[resPosition] = op1 + op2;
+            case '01': { // sum
+                data[op3Pos] = op1 + op2;
                 index += 4;
 
                 break;
             }
-            case '02': {
-                data[resPosition] = op1 * op2;
+            case '02': { // multiply
+                data[op3Pos] = op1 * op2;
                 index += 4;
 
                 break;
             }
-            case '03': {
-                data[op1Pos] = 1;
+            case '03': { // INPUT
+                data[op1Pos] = INPUT;
                 index += 2;
+
                 break;
             }
-            case '04': {
+            case '04': { // output
                 outputs.push(op1);
                 index += 2;
                 break;
             }
-            case '99': {
+            case '05': { // jump-if-true
+                if (op1 !== 0) {
+                    index = op2;
+                } else {
+                    index += 3;
+                }
+
+                break;
+            }
+            case '06': { // jump-if-false
+                if (op1 === 0) {
+                    index = op2;
+                } else {
+                    index += 3;
+                }
+
+                break;
+            }
+            case '07': { // less than
+                const i = op1 < op2 ? 1 : 0;
+                data[op3Pos] = i;
+                index += 4;
+
+                break;
+            }
+            case '08': { // equals
+                const i = op1 === op2 ? 1 : 0;
+                data[op3Pos] = i;
+                index += 4;
+
+                break;
+            }
+            case '99': { // halt
                 return outputs;
             }
         }
     }
 }
 
+const result = program(data, 5);
+console.log(result); 
 
-const result = program(data);
-console.log(result.pop());
+// let result = program([3,9,8,9,10,9,4,9,99,-1,8], 8);
+// console.log(result); 
+
+// result = program([3,9,7,9,10,9,4,9,99,-1,8], 8);
+// console.log(result); 
+
+// result = program([3,3,1108,-1,8,3,4,3,99], 8);
+// console.log(result); 
+
+// result = program([3,3,1107,-1,8,3,4,3,99], 8);
+// console.log(result); 
+
+// result = program([3,12,6,12,15,1,13,14,13,4,13,99,-1,0,1,9], 0);
+// console.log(result); 
+
+// result = program([3,3,1105,-1,9,1101,0,0,12,4,12,99,1], 0);
+// console.log(result); 
+
+// result = program([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
+//     1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
+//     999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], 9);
+// console.log(result); 
