@@ -8,30 +8,24 @@ const families = orbits.map(x => {
     return { parent, child };
 });
 
-const result = families.reduce((parents, orbit) => {
-    parents[orbit.parent] = parents[orbit.parent] || [];
+const YOU = families.find(x => x.child === 'YOU');
+const SAN = families.find(x => x.child === 'SAN');
 
-    parents[orbit.parent].push(orbit.child);
 
-    return parents;
-}, {});
+const youRoute = findRouteToCOM(YOU);
+const sanRoute = findRouteToCOM(SAN);
 
-const counts = Object.keys(result)
-    .reduce((childs, key) => {
-        childs.push(...result[key]);
-        return childs;
-    }, [])
-    .map(child => {
-        let count = 0;
-        let parent = child;
+while( youRoute.pop() === sanRoute.pop());
 
-        while (parent !== 'COM') {
-            count++;
-            parent = families.find(x => x.child === parent).parent;
-        }
+console.log(youRoute.length + sanRoute.length);
 
-        return count;
-    })
-    .reduce((a, b) => a + b, 0);
-
-console.log(counts);
+function findRouteToCOM(fam) {
+    const route = [];
+    let parent = fam.child;
+    while (parent !== 'COM') {
+        route.push(parent);
+        
+        parent = families.find(x => x.child === parent).parent;
+    }
+    return route;
+}
